@@ -1,0 +1,10 @@
+variant,variant_key,seed,pdr,anomaly_tool_calls,invalid_action_rate
+Full agent,full,42,0.962,1,0.0
+No anomaly tool,no_anomaly,42,0.6646,0,0.0
+No LoRa facts,no_lora_facts,42,0.9367,1,0.4
+Full agent,full,123,0.9427,1,0.0
+No anomaly tool,no_anomaly,123,0.6051,0,0.0
+No LoRa facts,no_lora_facts,123,0.9427,1,0.4
+Full agent,full,7,0.9034,1,0.0
+No anomaly tool,no_anomaly,7,0.5931,0,0.0
+No LoRa facts,no_lora_facts,7,0.8897,1,0.4
