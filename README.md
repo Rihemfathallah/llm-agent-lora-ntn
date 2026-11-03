@@ -2,7 +2,7 @@
 
 Event-triggered LLM agent for adaptive LoRa parameter control (spreading factor, TX power, channel, link) in hybrid terrestrial + LEO-satellite IoT networks. A simulation study that runs entirely on a laptop CPU: no radio hardware, no GPU.
 
-> **Status: work in progress.** The PHY layer, channel models and network simulator are implemented and measured. The LLM agent is implemented but **not yet evaluated end to end**: the current E4–E6 outputs come from a scripted policy or a mock, not from the agent. Details in [Status](#status).
+>  The PHY layer, channel models and network simulator are implemented and measured. The LLM agent is implemented but **not yet evaluated end to end**: the current E4–E6 outputs come from a scripted policy or a mock, not from the agent. Details in [Status](#status).
 
 ## Research question
 
