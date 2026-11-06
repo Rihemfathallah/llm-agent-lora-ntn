@@ -1,0 +1,8 @@
+name: S1-jamming
+description: Jammer 15 dB above the noise floor on 868.1 MHz at the terrestrial gateway for 30 min.
+anomalies:
+  - {type: jamming, start_s: 3600, duration_s: 1800, channel_mhz: 868.1, interference_db: 15.0}
+deployment:
+  remote_fraction: 0.0
+satellite:
+  enabled: false

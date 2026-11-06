@@ -1,0 +1,50 @@
+\section{System Model}
+\label{sec:model}
+
+\subsection{Scenario}
+A rural cell holds $N$ LoRa end devices that report a 20-byte reading about every 10\,min
+(period uniform in $[540, 660]$\,s, random phase). A terrestrial gateway (Okumura--Hata rural,
+$h_b=30$\,m, $h_m=1.5$\,m, log-normal shadowing $\sigma=7$\,dB per device plus 3\,dB per packet)
+covers devices within 12\,km; in the hybrid scenarios 20\,\% of the devices are placed 30--45\,km
+away, outside terrestrial coverage, and rely on a LEO satellite gateway at 600\,km
+($G_{rx}=6$\,dBi, NF $=6$\,dB) that is usable above 10$^\circ$ of elevation.
+EU868: channels 868.1/868.3/868.5\,MHz, 125\,kHz, all in sub-band g1, hence a 1\,\% duty cycle per
+device (silent $99\,T_{oA}$ after each packet). Transmit power is 2--14\,dBm and energy is
+$E=V\,I_{tx}(P)\,T_{oA}$ with the SX1276 RFO currents of the datasheet~\cite{semtechSX1276};
+$T_{oA}$ follows the Semtech formula~\cite{semtechAN120013}.
+
+\subsection{LoRa physical layer under a Doppler rate}
+Symbol $m$ of a chirp at $SF$ is $x_m[n]=\exp\!\big(j2\pi(n^2/2N+(m/N-\tfrac12)n)\big)$, $N=2^{SF}$,
+demodulated by dechirping and an FFT~\cite{vangelista2017}. We validated the Monte Carlo SER against the exact
+noncoherent $N$-ary formula~\cite{proakis} (Fig.~\ref{fig:e1}a). The static Doppler shift is removed using the
+preamble; what remains is the Doppler \emph{rate} $\dot f_D$, which makes the residual offset grow
+linearly during the packet. Payload symbol $k$ sees
+$f_k(t)=\dot f_D\,(t-t_{\mathrm{ref}})$, and an FFT bin is only $BW/2^{SF}$ wide
+(30.5\,Hz at SF12). Two receivers bracket real hardware:
+\textbf{A} (\emph{preamble}) corrects the offset once, at the preamble centre;
+\textbf{B} (\emph{tracking}) runs a first-order decision-directed loop on the fractional peak
+position (Jacobsen estimator~\cite{jacobsen2007}) starting from the last preamble up-chirp, without knowing $\dot f_D$.
+Reduced-rate symbols (the 8-symbol header block, and the payload when DE\,=\,1 at SF11--12)
+carry $SF-2$ bits and tolerate $\pm2$ bins instead of $\pm0.5$. With CR\,4/5 a single wrong symbol
+loses the packet, so the packet error rate is computed packet by packet rather than with
+$1-(1-SER)^n$, which would ignore that drift concentrates errors at the end of the packet.
+The resulting tables $\mathrm{PER}(SF,\mathrm{SNR},|\dot f_D|)$ (\PerPackets{} packets per point)
+are the only PHY input of the network simulator.
+
+\subsection{Satellite channel}
+Pass geometry is closed form for a circular orbit and a given maximum elevation (Earth rotation
+ignored): range $d(t)$, elevation, Doppler $f_D=-(f_c/c)\dot d$ and rate $-(f_c/c)\ddot d$.
+Path loss is free space plus the 3GPP TR~38.811~\cite{tr38811} suburban/rural S-band model
+(LOS probability, LOS/NLOS shadow fading, NLOS clutter loss of 16--19.5\,dB), used as an
+approximation at 868\,MHz.
+
+\subsection{Network and control plane}
+The event-driven simulator resolves collisions per gateway with pure ALOHA, as in~\cite{bor2016} (same channel and SF,
+time overlap, 6\,dB capture; SFs orthogonal). A packet succeeds if it survives collisions, its
+gateway is up, and a Bernoulli draw passes the PER table. Every policy-independent random number
+(positions, shadowing, reading times, per-packet fading, LOS state, the PER uniform, channel
+hopping) is pre-drawn per device and seed, so all policies see the same channel realisations and
+comparisons are paired. Network-side decisions reach a device only in the downlink after one of its
+delivered uplinks (LoRaWAN class~A~\cite{lorawan104}); during a pass a broadcast satellite downlink can reach all
+devices. The network server only knows delivered uplinks, losses inferred from frame-counter gaps,
+the gateway noise floor and the satellite ephemeris.

@@ -1,0 +1,49 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\textbf{Answer to the research question.} With a 0.6B model, no: the agent did not beat ADR in any
+scenario, degraded the network in the traffic surge and under heavy load, and its few actions were
+almost always the same template rather than a response to the observed event. The event-triggered architecture, however,
+is clearly useful: the same triggers, telemetry and leased overrides driven by six hand-written
+rules gain 10--15 points in three of the five scenarios. An LLM agent is only worth its cost if it
+beats that rule set, for instance on combinations of events that no rule anticipates. Whether a
+3B--7B model clears that bar is the next measurement; the scripts run unchanged with Ollama
+(\texttt{--backend ollama --model qwen2.5:3b}).
+
+\textbf{Validated is not safe.} Range validation, the read-before-write rule and the tool cap all
+held, yet the agent's only recurrent action (every device to SF12) was harmful during a surge, and in
+one run its explanation contradicted its action. We tested a predicted-load check (reject an action whose
+offered load would exceed the ALOHA optimum $G=0.5$) and found that it would not have blocked this
+case, because the surge had not been observed yet when the agent acted. Effective protection needs
+to act on consequences: roll an override back when the measured loss rises after it, apply it first
+to a subset of devices, or simulate it in a digital twin of the network before applying it --- the
+simulator of this work could serve as that twin.
+
+\textbf{Physics first.} The Doppler rate makes the best SF over a LEO pass change within minutes,
+much faster than ADR's 20-uplink history, and whether SF12 survives near zenith depends on the
+receiver's frequency tracking (Fig.~\ref{fig:e2b}). A controller that knows the ephemeris and the
+receiver's Doppler limits can choose the SF from the elevation; ADR cannot.
+
+\textbf{The control plane bounds every controller.} Under class~A, a command waits for the next
+delivered uplink. Agent latency (seconds) is negligible against this delay (minutes), and a deep
+fade cannot be fixed from the network at all; only device-side logic or class~B/C downlinks could.
+
+\textbf{Oracles and imitation.} A per-packet oracle that minimises energy is not an upper bound under
+heavy load, and a classifier that imitates it without its information under-provisions. Labels
+should target an expected PER given what the network can observe, and should account for collisions.
+
+\textbf{Limitations.} No Earth rotation; S-band TR~38.811 tables at 868\,MHz; orthogonal SFs; no
+background traffic at the satellite; a broadcast satellite downlink is assumed; one pass per
+scenario and 3\,h horizons; receivers A and B are models, not the Semtech demodulator; the agent
+results come from a 0.6B model run through llama.cpp because the development environment could not
+reach Ollama. All assumptions are listed in the repository (\texttt{docs/ASSUMPTIONS.md}).
+
+\section{Conclusion}
+We built a reproducible, Doppler-aware simulation of a hybrid terrestrial--LEO LoRa network and
+evaluated an event-triggered LLM agent against fixed SFs, ADR, an ML classifier, an oracle and a
+rule-based controller on the same triggers. The physical layer reproduces the measured SF12 limit
+of LEO links within about 100\,km of altitude. The event-triggered architecture gains about ten
+points of delivery ratio during jamming, satellite pass ends and gateway outages. A 0.6B agent did
+not exploit it and once caused harm that schema validation could not stop. Next steps: the 3B and
+7B models, a consequence-aware safety layer, store-and-forward buffering, and several passes per
+day with Earth rotation.

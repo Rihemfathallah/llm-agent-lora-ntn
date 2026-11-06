@@ -1,0 +1,7 @@
+sf,semtech_threshold_db,snr_per1pct_analytic_db,snr_per10pct_analytic_db,gap_per1pct_vs_threshold_db,n_payload_symbols
+7,-7.5,-7.18,-8.21,0.32,43
+8,-10.0,-10.02,-11.02,-0.02,38
+9,-12.5,-12.87,-13.85,-0.37,33
+10,-15.0,-15.69,-16.64,-0.69,33
+11,-17.5,-18.51,-19.43,-1.01,33
+12,-20.0,-21.4,-22.32,-1.4,28

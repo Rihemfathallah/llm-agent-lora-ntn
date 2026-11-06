@@ -1,0 +1,49 @@
+% IEEE conference format.  On Overleaf (IEEEtran.cls available) this compiles
+% as an IEEE conference paper; elsewhere a close stand-in (ieee-fallback.sty)
+% is used.  Every number comes from numbers.tex (python report/make_numbers.py).
+\IfFileExists{IEEEtran.cls}{%
+  \documentclass[conference]{IEEEtran}}{%
+  \documentclass[10pt,twocolumn,letterpaper]{article}\usepackage{ieee-fallback}}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{cite}
+\usepackage{placeins}
+\input{numbers.tex}
+
+\begin{document}
+
+\title{An Event-Triggered LLM Agent for LoRa Parameter Control over Hybrid Terrestrial--LEO Links:
+Doppler-Aware Simulation and Honest Baselines}
+
+\author{\IEEEauthorblockN{Rihem Fathallah}
+\IEEEauthorblockA{Telecommunications Engineering, ENET'Com, University of Sfax, Tunisia\\
+rihem.fathallahengineer@gmail.com}}
+
+\date{}
+\maketitle
+
+\begin{abstract}
+\input{sections/abstract.tex}
+\end{abstract}
+
+\begin{IEEEkeywords}
+LoRa, LEO satellite, direct-to-satellite IoT, Doppler rate, adaptive data rate, LLM agent, tool calling.
+\end{IEEEkeywords}
+
+\input{sections/intro.tex}
+\input{sections/model.tex}
+\input{sections/method.tex}
+\input{sections/results_phy.tex}
+\input{sections/results_net.tex}
+\FloatBarrier
+\input{sections/discussion.tex}
+
+\IfFileExists{IEEEtran.bst}{\bibliographystyle{IEEEtran}}{\bibliographystyle{ieeetr}}
+\bibliography{refs}
+
+\end{document}

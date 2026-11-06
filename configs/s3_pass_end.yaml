@@ -1,0 +1,7 @@
+name: S3-satellite-pass-end
+description: A 70-degree LEO pass ends at t = 1 h; remote devices depend on it.
+satellite:
+  passes:
+    - {t_set_s: 3600, max_elevation_deg: 70.0}
+anomalies:
+  - {type: satellite_pass_end, start_s: 3600}

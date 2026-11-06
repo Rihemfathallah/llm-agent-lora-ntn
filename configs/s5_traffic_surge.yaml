@@ -1,0 +1,8 @@
+name: S5-traffic-surge
+description: Every device reports 5 times faster for 30 min.
+anomalies:
+  - {type: traffic_surge, start_s: 3600, duration_s: 1800, rate_multiplier: 5.0}
+deployment:
+  remote_fraction: 0.0
+satellite:
+  enabled: false

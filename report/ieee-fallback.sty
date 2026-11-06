@@ -1,0 +1,18 @@
+% Minimal stand-in for IEEEtran.cls when it is not installed (Overleaf has it).
+% Loaded only by main.tex when IEEEtran.cls is missing.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{ieee-fallback}[2026/11/06 IEEE-like layout without IEEEtran]
+\RequirePackage[letterpaper,top=0.75in,bottom=1in,left=0.625in,right=0.625in,columnsep=0.25in]{geometry}
+\RequirePackage{times}
+\RequirePackage[small,bf]{caption}
+\RequirePackage{titlesec}
+\titleformat{\section}{\normalfont\scshape\centering}{\Roman{section}.}{0.5em}{}
+\titleformat{\subsection}{\normalfont\itshape}{\Alph{subsection}.}{0.5em}{}
+\titlespacing*{\section}{0pt}{1.2ex}{0.8ex}
+\titlespacing*{\subsection}{0pt}{1ex}{0.5ex}
+\newcommand{\IEEEauthorblockN}[1]{#1\\}
+\newcommand{\IEEEauthorblockA}[1]{\small #1}
+\newenvironment{IEEEkeywords}{\par\noindent\textbf{\textit{Index Terms}}---\itshape}{\par}
+\renewenvironment{abstract}{\par\noindent\textbf{\textit{Abstract}}---\bfseries\small}{\par}
+\newcommand{\IEEEPARstart}[2]{#1#2}
+\setlength{\parskip}{0pt}

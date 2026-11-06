@@ -1,0 +1,13 @@
+Direct-to-satellite LoRa links change faster than adaptive data rate (ADR) can follow, and network
+events such as jamming or gateway outages are outside what ADR was designed for. We ask whether a small,
+local LLM agent, called only on events and acting through five validated tools, controls LoRa
+parameters better than ADR in a hybrid terrestrial--LEO network. We model LoRa under the Doppler
+rate of a 600\,km pass at packet level with two receiver classes: with frequency tracking, our
+model loses SF12 near zenith below about \EtwoBSFtwelveZenithFrom\,km, close to the 550\,km measured
+on a CubeSat; without tracking, no spreading factor works over a whole pass. In an event-driven
+simulator with a class-A control plane and paired seeds, a rule-based controller on the same
+triggers as the agent gains \SOneDiffRules, \SThreeDiffRules{} and \SFourDiffRules{} points of
+delivery ratio over ADR during jamming, the end of a pass and a gateway outage. A 0.6B agent
+(Qwen3, \AgentDecisions{} decisions, median latency \AgentLatMed\,s on two CPU threads) never beat
+ADR and lost \SFiveDiffAgent{} points on average during a traffic surge, through actions that passed
+schema validation. Code, data and agent traces are public.

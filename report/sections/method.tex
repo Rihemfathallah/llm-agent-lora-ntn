@@ -1,0 +1,61 @@
+\section{Controllers}
+\label{sec:method}
+
+\textbf{Fixed SF7 / SF12} use 14\,dBm. \textbf{ADR} follows Semtech's recommended rule:
+after 20 uplinks, $\text{margin}=\max\text{SNR}-\text{SNR}_\text{req}(SF)-10$\,dB,
+$N_\text{step}=\lfloor\text{margin}/3\rfloor$, lowering SF then power, raising power if negative;
+it starts from its own fixed point on 20 earlier uplinks so that a 3\,h run measures steady state.
+\textbf{ML-HGB} is a histogram gradient-boosting classifier that predicts (SF, power) after each
+delivered uplink from the last five SNRs, the device loss rate, current SF/power/link, satellite
+elevation, Doppler rate and an anomaly flag (the same information the agent can read); its labels
+are the oracle's choices for the device's next reading, collected on 8 training seeds disjoint from
+the 5 evaluation seeds. The \textbf{Oracle} sees the true channel of every packet (including its
+fading) and picks link, channel, SF and power with the lowest energy at PER $\le$ 1\,\%, or waits
+when no gateway can receive; it ignores collisions.
+
+\textbf{Event-triggered LLM agent.} ADR runs by default. The agent is called only when the
+anomaly detector raises an alert, when the inferred loss rate exceeds 10\,\%, when the satellite
+rises, sets or will set within 2\,min, and every 30\,min (10\,min cooldown per trigger). The user
+message only names the trigger category; details must be read with five tools:
+\texttt{get\_link\_stats}, \texttt{get\_satellite\_status}, \texttt{get\_anomaly\_report},
+\texttt{get\_network\_load} and \texttt{set\_tx\_params(target, sf, tx\_power\_dbm, channels, link,
+duration\_s)}. Targets are groups (all, terrestrial, satellite, affected, or device ids) and every
+change is a lease that expires back to ADR. Guardrails: schema and range validation (rejections are
+counted), ``read before you write'' enforced, at most 6 tool calls per decision, timeout, and fallback
+to ADR on any backend error. The system prompt states the role, LoRa facts computed from the code
+(thresholds, time on air, energy, FFT bin width), the objective (delivery first, then energy) and
+how actions take effect. Temperature is 0 with a fixed seed, and simulated time is frozen while the
+model thinks; wall-clock latency is recorded.
+
+\textbf{Triggered-Rules} (not in the original plan) reacts to the same triggers with the same
+information and the same lease mechanism, using hand-written rules: avoid a jammed channel, raise
+SF of degraded devices, move devices to the satellite during an outage, make satellite devices wait
+outside passes, and spread SF7 devices over SF8 during a surge. It isolates the value of the LLM's
+reasoning from the value of the event-triggered architecture.
+
+\textbf{Detector.} Rolling z-scores on the per-channel noise floor (every minute) and, per 5-min
+block, on per-channel mean SNR, the inferred loss rate (binomial test), the uplink count (Poisson
+test) and the share of silent devices, with two consecutive exceedances required; plus gateway
+silence over 5\,min.
+
+\textbf{Protocol.} Five scenarios (Table~\ref{tab:scen}) start with an event at $t=1$\,h in a 3\,h
+run with $N=300$; every (scenario, policy) pair runs on the same 5 seeds. Metrics: PDR = delivered /
+sent, energy per delivered packet, recovery time (end of the last 10-min bin whose PDR is more than
+5\,\% below the pre-event PDR, judged until 1\,h after the end of the event; censored otherwise),
+and the
+invalid-action rate (rejected / total \texttt{set\_tx\_params} calls).
+
+\begin{table}[t]
+\caption{Anomaly scenarios (event at $t=1$\,h, 3\,h runs, $N=300$).}
+\label{tab:scen}
+\centering\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+S1 jamming & +15\,dB on 868.1\,MHz at the gateway, 30\,min\\
+S2 deep fade & +20\,dB loss for 20\,\% of devices, 30\,min\\
+S3 pass end & 70$^\circ$ pass ends at 1\,h; 20\,\% remote devices\\
+S4 gateway outage & terrestrial gateway down 30\,min, 60$^\circ$ pass inside\\
+S5 traffic surge & reporting rate $\times5$, 30\,min\\
+\bottomrule
+\end{tabular}
+\end{table}

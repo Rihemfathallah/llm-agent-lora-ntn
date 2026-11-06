@@ -1,0 +1,95 @@
+# Base configuration shared by every experiment.
+# Scenario files (s*.yaml) and experiment scripts override keys by deep merge.
+# Every number here is a modelling choice: see docs/ASSUMPTIONS.md.
+
+duration_s: 10800            # 3 h of simulated time
+seeds: [0, 1, 2, 3, 4]       # evaluation seeds (5 per the protocol)
+train_seeds: [100, 101, 102, 103, 104, 105, 106, 107]   # ML training only, disjoint
+
+phy:
+  bandwidth_hz: 125000
+  payload_bytes: 20
+  coding_rate: 1             # 4/5
+  receiver: tracking         # PER table: tracking | preamble | threshold
+  sfs: [7, 8, 9, 10, 11, 12]
+  tx_powers_dbm: [2, 5, 8, 11, 14]
+
+network:
+  n_devices: 300
+  report_interval_s: 600     # one 20-byte reading every ~10 min
+  report_jitter_frac: 0.1    # interval ~ U(0.9, 1.1) x 600 s
+  channels_mhz: [868.1, 868.3, 868.5]   # all in sub-band g1 (868.0-868.6 MHz)
+  duty_cycle: 0.01           # per device, sub-band g1: silent 99 x ToA after a TX
+  capture_threshold_db: 6.0
+  satellite_broadcast_downlink: true    # commands can reach any device during a pass
+  warm_start: true           # ADR/ML start from a converged state (20 past uplinks)
+
+deployment:
+  core_radius_km: 12.0       # devices uniform in a disk around the terrestrial gateway
+  remote_fraction: 0.2       # share of devices placed outside terrestrial coverage
+  remote_radius_km: [30.0, 45.0]
+
+terrestrial:
+  frequency_mhz: 868.3
+  gw_height_m: 30.0
+  device_height_m: 1.5
+  environment: rural
+  shadowing_std_db: 7.0      # log-normal, fixed per device (slow)
+  fast_fading_std_db: 3.0    # per-packet variation (dB)
+  gw_antenna_gain_dbi: 0.0
+  device_antenna_gain_dbi: 0.0
+  noise_figure_db: 6.0
+  coverage_margin_db: 3.0    # terrestrial if median SNR at 14 dBm >= SNR_req(SF12) + margin
+
+satellite:
+  enabled: true
+  altitude_km: 600.0
+  frequency_hz: 868300000.0
+  rx_gain_dbi: 6.0
+  noise_figure_db: 6.0
+  device_antenna_gain_dbi: 0.0
+  min_elevation_deg: 10.0
+  passes: []                 # list of {t_closest_s | t_set_s, max_elevation_deg}
+
+adr:
+  history_len: 20
+  margin_db: 10.0
+  step_db: 3
+  initial_sf: 12
+  initial_power_dbm: 14
+  reset_history_on_change: true
+
+detector:
+  tick_s: 60
+  z_threshold: 3.0
+  window: 30                 # ticks in the rolling reference window
+  min_samples: 10
+  silence_s: 300             # gateway silent this long -> alert
+  persistence: 2             # consecutive exceedances before an alert
+  noise_meas_std_db: 0.5
+
+agent:
+  backend: ollama            # ollama | llamacpp
+  model: qwen2.5:3b
+  model_path: null           # GGUF file for the llamacpp backend
+  n_threads: 2               # llamacpp backend only
+  max_tool_calls: 6
+  timeout_s: 300
+  temperature: 0.0
+  seed: 0
+  per_trigger: 0.10
+  periodic_review_s: 1800
+  cooldown_s: 600
+  default_lease_s: 1800
+  max_lease_s: 7200
+  include_lora_facts: true
+  enable_anomaly_tool: true
+  cache_dir: results/llm_cache
+
+metrics:
+  pdr_bin_s: 600
+  pre_event_window_s: 1800
+  recovery_tolerance: 0.05   # relative: PDR back within 5 % of the pre-event level
+  recovery_horizon_s: 3600      # judged until event end + 1 h
+
+anomalies: []

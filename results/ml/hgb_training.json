@@ -1,0 +1,24 @@
+{
+  "n_samples": 189169,
+  "n_classes": 11,
+  "train_seeds": [
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107
+  ],
+  "train_accuracy": 0.5794924115473465,
+  "scenarios": [
+    "e3_scalability",
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5"
+  ],
+  "seconds": 85.5
+}

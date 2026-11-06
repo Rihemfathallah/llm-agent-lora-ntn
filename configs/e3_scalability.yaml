@@ -1,0 +1,7 @@
+name: E3-scalability
+description: Terrestrial-only cell, no anomalies, N devices swept.
+duration_s: 7200
+deployment:
+  remote_fraction: 0.0
+satellite:
+  enabled: false

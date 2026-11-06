@@ -1,0 +1,26 @@
+\section{Introduction}
+Direct-to-satellite IoT extends LoRa coverage to areas without terrestrial gateways by placing a
+gateway on a low-Earth-orbit (LEO) satellite~\cite{fraire2019}. The link is only available during
+passes of a few minutes, its SNR follows the elevation, and the carrier drifts by hundreds of hertz
+per second near zenith. Adaptive data rate (ADR)~\cite{semtechADR} was designed for static
+terrestrial links: it needs 20 uplinks (more than three hours at one reading every 10 minutes) and
+never raises the spreading factor (SF) on its own. Events such as jamming, blockage, gateway outages
+or the end of a satellite pass are outside what it was designed for.
+
+Large language models (LLMs) that call tools~\cite{yao2023react} have been proposed for network
+operation~\cite{maatouk2024}. This work asks a narrow question that can be measured:
+\emph{can a small, local LLM agent, called only on events and acting through validated tools,
+choose LoRa parameters better than ADR and a classifier trained on oracle labels when the rules do
+not anticipate an event, and what does it cost in decision latency?}
+
+\textbf{Contributions.}
+(i) A packet-level model of LoRa under a LEO Doppler rate with two receiver classes, validated
+against the exact noncoherent SER and compared with the 550\,km limit measured on a
+CubeSat~\cite{doroshkin2019}.
+(ii) An open hybrid terrestrial/LEO LoRa network simulator with a class-A control plane and common
+random numbers across policies, so every comparison is paired.
+(iii) An event-triggered LLM agent with five guarded tools, evaluated against fixed SFs, ADR, an ML
+classifier, an oracle, and a rule-based controller that uses the same triggers and information.
+(iv) A measurement of the agent's cost (latency, calls, invalid actions) on a laptop-class CPU.
+All code, configurations, raw CSV files, agent traces and figure scripts are in the repository;
+every number in this report is generated from them.

@@ -1,0 +1,8 @@
+name: S2-deep-fade
+description: 20 % of the terrestrial devices lose 20 dB more for 30 min (blockage).
+anomalies:
+  - {type: deep_fade, start_s: 3600, duration_s: 1800, device_fraction: 0.2, extra_loss_db: 20.0}
+deployment:
+  remote_fraction: 0.0
+satellite:
+  enabled: false

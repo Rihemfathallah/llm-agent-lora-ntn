@@ -1,0 +1,7 @@
+name: S4-gateway-outage
+description: Terrestrial gateway down for 30 min; a 60-degree pass occurs during the outage.
+satellite:
+  passes:
+    - {t_closest_s: 4500, max_elevation_deg: 60.0}
+anomalies:
+  - {type: gateway_outage, start_s: 3600, duration_s: 1800}
