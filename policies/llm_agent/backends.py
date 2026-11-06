@@ -5,7 +5,7 @@ Two interchangeable backends expose ``chat(messages, tools) -> dict``:
 ``OllamaBackend``    the reference setup of the project (``ollama pull
                      qwen2.5:3b`` on a laptop).  Uses the ollama Python client.
 ``LlamaCppBackend``  runs a GGUF file in-process with llama-cpp-python.  Used
-                     where no Ollama server is available (e.g. a sandbox).  It
+                     where no Ollama server is available.  It
                      renders the model's own chat template (stored in the
                      GGUF) with the tool schemas, and parses the
                      ``<tool_call>{json}</tool_call>`` blocks that Qwen-family

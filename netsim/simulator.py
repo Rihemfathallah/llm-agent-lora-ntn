@@ -468,7 +468,7 @@ class NetworkSimulator:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# Recovery time (metric definition in AGENTS.md)
+# Recovery time (metric definition in docs/PROTOCOL.md)
 # ═══════════════════════════════════════════════════════════════════════════
 
 def recovery_time(ts: dict[str, np.ndarray], t_event: float, cfg: dict[str, Any],

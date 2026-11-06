@@ -1,58 +1,13 @@
-# Project 2: LLM Agent for Adaptive Modulation in Hybrid Terrestrial–Satellite IoT Networks
+# Research plan: LLM agent for adaptive modulation in hybrid terrestrial–satellite IoT networks
 
-**Extracted from the detailed build plan for Rihem Fathallah's research portfolio.**
-Target profile: machine learning for 5G/6G and non-terrestrial wireless networks.
-Everything runs on a personal computer: no radio hardware, no GPU.
+Original plan written before implementation. Where the implementation departs from it, the
+reason is given in [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
----
-
-## Contents
-
-1. Summary and planning
-2. Ground rules
-3. Project details (research question, scenario, LoRa PHY, channel, phases, experiments, repository, pitfalls, reading list)
-4. Setup for this project
-5. Interview preparation
-6. CV lines
-
----
-
-## 1. Summary and planning
-
-| Item | Value |
-|---|---|
-| Mitacs projects it prepares for | Langar (ETS, GenAI modulation agent), Trajkovic (SFU, anomaly detection), Jaafar (NTN) |
-| Difficulty | Medium |
-| Time to first result | ~5 weeks |
-| Planned period | November 2026 (phases 1–4 and a first agent run on one scenario); full benchmark January–April 2027 |
-| Milestone for end of November | Validated LoRa PHY, network simulator, ADR baseline, first agent run |
-
-**Why this position in the order:** Project 2 reuses the channel-modeling habits from Project 1 (link budget, Monte Carlo, baselines, config files).
-
-**Shared thread with the other projects:** *can a learning-based controller beat a classical method in a wireless network, and at what cost?*
-
-If you fall behind, cut extensions, never baselines.
-
----
-
-## 2. Ground rules (shared by all three projects)
-
-1. **Only real results.** Your CV says "In progress" for these projects. Keep it that way until you have figures. Every number in a report or on your CV must come from a script in your repository that anyone can re-run.
-2. **Git from day one.** One repository per project, commits at least every working session, a README with the main figure at the top.
-3. **Reproducibility.** Parameters in a YAML config file, fixed random seeds, raw results saved as CSV, and one script per figure that regenerates it from the CSV.
-4. **Always compare against baselines**, including a simple one (random, fixed, rule-based) and, when possible, an upper bound. A method with no baseline is a demo, not research.
-5. **Keep an experiment log.** A `LOG.md` file with the date, what you ran, what you saw and what you will try next. This log is extremely useful in interviews: it lets you tell the story of your work in detail.
-6. **Write while you build.** Open the IEEE conference template on Overleaf on day one. Each project ends with a 4–6 page report: Introduction, System Model, Proposed Method, Results, Conclusion.
-
----
-
-## 3. Project: LLM Agent for Adaptive Modulation in Hybrid Terrestrial–Satellite IoT Networks
-
-### 3.1 Research question
+## 1. Research question
 
 Can an LLM agent that reads link telemetry and calls control tools choose LoRa transmission parameters better than a rule-based adaptive data rate (ADR) algorithm and a trained ML classifier, especially during events the rules don't anticipate (jamming, deep fades, the end of a satellite pass)? And what does it cost in decision latency?
 
-### 3.2 Scenario
+## 2. Scenario
 
 - A rural area with 100 to 1,000 LoRa end devices (environmental sensors). Each sends a 20-byte payload about every 10 minutes, with random jitter.
 - A **terrestrial LoRa gateway** at the center covers devices within a few kilometers.
@@ -60,7 +15,7 @@ Can an LLM agent that reads link telemetry and calls control tools choose LoRa t
 - EU868 band: three default channels (868.1, 868.3 and 868.5 MHz), 125 kHz bandwidth, 1% duty cycle.
 - The controller decides, per device or group: **link** (terrestrial, satellite or wait), **spreading factor** SF7–SF12, **transmit power** 2–14 dBm, and **channel**.
 
-### 3.3 LoRa physical layer
+## 3. LoRa physical layer
 
 **Key formulas**
 
@@ -99,9 +54,9 @@ Demodulation: multiply the received symbol by `conj(x_0[n])`, which leaves a pur
 
 **Doppler.** Apply a frequency offset that drifts over the packet: multiply the samples by `exp( j2π · (f_D·t + ½·f_D'·t²) )` with `t = n / BW`. Real receivers estimate and remove the static offset `f_D` from the preamble, so model a residual error plus the **Doppler rate** `f_D'`, which keeps drifting during the packet.
 
-**The key physical insight to verify.** An FFT bin is `BW / 2^SF` wide: about 976 Hz at SF7 but only about 30.5 Hz at SF12 (125 kHz). A 20-byte packet lasts about 57 ms at SF7 and about 1.3 s at SF12. For a 600 km LEO pass at 868 MHz, the Doppler rate near zenith is roughly `(f_c/c) · v²/h ≈ 275 Hz/s`. Over an SF12 packet, the frequency drifts by hundreds of hertz, many times the bin width, while at SF7 the drift stays small. So the most robust setting on the ground (SF12) can be the most fragile over a satellite. That tension is what makes adaptive modulation over LEO an interesting research problem. Confirm it with your simulator rather than assuming it.
+**The key physical insight to verify.** An FFT bin is `BW / 2^SF` wide: about 976 Hz at SF7 but only about 30.5 Hz at SF12 (125 kHz). A 20-byte packet lasts about 57 ms at SF7 and about 1.3 s at SF12. For a 600 km LEO pass at 868 MHz, the Doppler rate near zenith is roughly `(f_c/c) · v²/h ≈ 275 Hz/s`. Over an SF12 packet, the frequency drifts by hundreds of hertz, many times the bin width, while at SF7 the drift stays small. So the most robust setting on the ground (SF12) can be the most fragile over a satellite. That tension is what makes adaptive modulation over LEO an interesting research problem. To be confirmed with the simulator rather than assumed.
 
-### 3.4 Channel and link budget
+## 4. Channel and link budget
 
 **Terrestrial link: Okumura–Hata** (valid 150–1,500 MHz, 1–20 km), `f` in MHz, `d` in km, heights in meters:
 
@@ -134,7 +89,7 @@ SNR = P_tx + G_tx + G_rx − L_path − L_shadow − L_clutter − (−174 + 10�
 
 Make the satellite receive antenna gain a parameter. Run the budget before anything else: you will probably find that the satellite link only closes at high SF near zenith, which is exactly where the Doppler rate is worst. That is a result worth a figure.
 
-### 3.5 Phases
+## 5. Phases
 
 **Phase 1: LoRa PHY simulator and lookup tables (weeks 1–2)**
 
@@ -197,7 +152,7 @@ Detector: rolling z-score on each channel's noise floor, SNR and PER, optionally
 - a satellite elevation threshold is crossed;
 - a periodic review every 30 simulated minutes.
 
-This keeps the number of LLM calls and the latency low, and it's a design choice you can defend in an interview.
+This keeps the number of LLM calls and the latency low.
 
 *Tools exposed to the agent:*
 
@@ -234,15 +189,15 @@ def run_agent(event_description):
             break
         for call in response.message.tool_calls:
             result = REGISTRY[call.function.name](**call.function.arguments)
-            # check the ollama-python examples for the exact tool-message format of your version
+            # tool-message format depends on the ollama-python version
             messages.append({"role": "tool", "content": json.dumps(result),
                              "tool_name": call.function.name})
-    return messages   # save it: the reasoning trace is part of your results
+    return messages   # saved: the reasoning trace is part of the results
 ```
 
 *Time handling:* pause simulated time while the agent thinks, so its latency doesn't distort the simulation, but record the real wall-clock latency and discuss whether it would fit an IoT network where devices report every few minutes.
 
-### 3.6 Experiments
+## 6. Experiments
 
 | ID | Experiment | Output |
 |---|---|---|
@@ -262,7 +217,7 @@ Run every experiment with 5 seeds and report mean ± standard deviation.
 - **Recovery time:** time from event start until PDR returns to within 5% of its pre-event level.
 - **Invalid-action rate:** rejected `set_tx_params` calls / total `set_tx_params` calls.
 
-### 3.7 Repository structure
+## 7. Repository structure
 
 ```
 llm-lora-ntn-agent/
@@ -295,7 +250,7 @@ llm-lora-ntn-agent/
 └── report/
 ```
 
-### 3.8 Common pitfalls
+## 8. Common pitfalls
 
 1. **Sample-level simulation inside the network simulator:** use lookup tables.
 2. **LLM randomness:** set temperature 0 and a fixed seed, and still run several seeds.
@@ -303,7 +258,7 @@ llm-lora-ntn-agent/
 4. **Hidden assumptions:** list them all in the report (no Earth rotation, S-band TR 38.811 tables, orthogonal SFs, PER from uncoded SER).
 5. **Accept any honest outcome.** The agent may match ADR in normal conditions and only help during rare events, or not help at all. Either result is valuable if it's well measured.
 
-### 3.9 Reading list
+## 9. Reading list
 
 - L. Vangelista, "Frequency Shift Chirp Modulation: The LoRa Modulation," *IEEE Signal Processing Letters*, 2017.
 - Semtech, *LoRa Modem Designer's Guide* (AN1200.13), for the time-on-air formula.
@@ -315,7 +270,7 @@ llm-lora-ntn-agent/
 
 ---
 
-## 4. Setup for this project
+## Setup
 
 | Item | What to install |
 |---|---|
@@ -327,23 +282,3 @@ llm-lora-ntn-agent/
 | Writing | VS Code, Git, Overleaf account (IEEE conference template) |
 
 **Hardware:** 8 GB RAM is enough for the 3B model; 16 GB makes `qwen2.5:7b` comfortable.
-
----
-
-## 5. Interview preparation
-
-Prepare these answers based on what you actually did.
-
-- Why can SF12 fail over a LEO satellite even with enough SNR? *(Long time on air combined with Doppler rate drift.)*
-- Why not call the LLM for every packet? *(Latency, energy, cost; event-triggered design.)*
-- How do you stop the agent from taking invalid or harmful actions? *(Schema validation, range checks, fallback to ADR, invalid-action metric.)*
-- How do you know the agent adds value over ADR? *(Same scenarios and seeds, ablations, recovery time after events.)*
-- What are the limits of your satellite model? *(No Earth rotation, S-band TR 38.811 tables as approximation, orthogonal SFs.)*
-
----
-
-## 6. CV lines
-
-Keep **"In progress"** on your CV until you have figures. Then use the metrics this project naturally produces: delivery ratio or energy gain over ADR, recovery time after anomalies, median decision latency.
-
-Example format: *"Built an event-triggered LLM agent for LoRa parameter control over terrestrial–LEO links, improving [metric] by [X]% over ADR with a median decision latency of [Y] s."* The bracketed numbers must come from your results folder.

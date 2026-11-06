@@ -1,7 +1,7 @@
 # Architecture and design decisions
 
 This file records where the implementation departs from, or adds to, the
-original specification (`docs/PROJECT_SPEC.md`), and why.
+original research plan (`docs/PROJECT_SPEC.md`), and why.
 
 ## Data flow
 
@@ -34,7 +34,7 @@ experiments/ e1…e6 ──▶ results/*.csv ──▶ results/*.png  (--plot-on
 | Oracle | lowest-energy (SF, power) with PER ≤ 1 % | Also chooses link and channel; waits when no gateway can receive; ignores collisions | Upper bound at link level. Not an upper bound on network PDR under heavy load (it puts everyone at the lowest SF). |
 | ML classifier | trained on oracle labels | Trained on oracle labels for the device's *next* reading, from simulations on 8 training seeds disjoint from the evaluation seeds, behaviour policy ADR + 30 % exploration; applied through class-A downlinks | Fair information (anomaly flag included, pitfall 3) and no train/test leakage. |
 | Detector | rolling z-score on noise floor, SNR, PER | Same statistics on 5-min blocks, binomial test for loss, Poisson test for load, 2-sample persistence, rising-edge alerts | The first version produced hundreds of false alerts per 3-h run. |
-| LLM backend | Ollama | Ollama **or** llama.cpp (GGUF), with a response cache | Same code in a sandbox without Ollama; cached answers make every figure reproducible without the model. |
+| LLM backend | Ollama | Ollama **or** llama.cpp (GGUF), with a response cache | Same code on a machine without Ollama; cached answers make every figure reproducible without the model. |
 
 ## How to add a model to the study
 

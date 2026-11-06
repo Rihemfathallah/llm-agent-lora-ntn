@@ -39,7 +39,7 @@
 
 ---
 
-## 2026-11-06 — Review, corrections, full re-run (session with Claude)
+## 2026-11-06 — Review, corrections, full re-run
 
 Every number below is copied from `results/summary.md` (generated from the CSV files).
 
@@ -74,11 +74,15 @@ python experiments/e1_phy_validation.py
 python experiments/e2_satellite_pass.py
 python experiments/e3_scalability.py
 python experiments/e4_anomalies.py
-bash experiments/run_llm_sandbox.sh   # E4/E6/E3 agent, Qwen3-0.6B Q4_K_M via llama.cpp, 2 CPU threads
+# agent (E4, E6, E3): Qwen3-0.6B Q4_K_M via llama.cpp, 2 CPU threads
+ARGS="--backend llamacpp --model qwen3-0.6b-q4km --model-path Qwen3-0.6B-Q4_K_M.gguf"
+python experiments/e4_anomalies.py --policies LLM-Agent $ARGS
+python experiments/e6_ablations.py $ARGS
+python experiments/e3_scalability.py --policies LLM-Agent --skip-aloha $ARGS
 python experiments/e5_agent_cost.py && python experiments/summarize.py
 ```
 
-Ollama and Hugging Face were unreachable from the sandbox. The model is Qwen3-0.6B Q4_K_M
+Ollama and Hugging Face were unreachable from the machine used for these runs. The model is Qwen3-0.6B Q4_K_M
 (unsloth GGUF, sha256 ac2d9771…524a, 396 705 472 bytes, checked against the published provenance
 file). On a laptop: `ollama pull qwen3:0.6b` gives the same model family; the reference model of the
 protocol is `qwen2.5:3b`.
@@ -117,6 +121,6 @@ protocol is `qwen2.5:3b`.
 
 ### Next
 
-1. Run E4 and E6 with `qwen2.5:3b` (and `7b`) through Ollama on the laptop (`docs/GUIDE_FR.md`).
+1. Run E4 and E6 with `qwen2.5:3b` (and `7b`) through Ollama on the laptop.
 2. Consequence-aware safety layer (rollback watchdog, staged rollout, twin simulation).
 3. Store-and-forward buffering; several passes per day with Earth rotation.

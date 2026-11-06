@@ -1,6 +1,6 @@
 # Assumptions and model limits
 
-Living file: every simplification in the code is listed here (AGENTS.md rule 8).
+Living file: every simplification in the code is listed here (docs/PROTOCOL.md, rule 8).
 
 ## Physical layer
 
@@ -52,4 +52,4 @@ Living file: every simplification in the code is listed here (AGENTS.md rule 8).
 | A6 | Simulated time is frozen while the agent thinks; wall-clock latency is recorded separately (E5). | `policies/llm_agent/agent.py` | Agent reactivity overestimated if its latency exceeds the reporting interval. |
 | A20 | The network server, the detector, the ML classifier, the rules and the agent only use network-server-side information (delivered uplinks, losses inferred from frame-counter gaps, gateway noise-floor measurements, satellite ephemeris). Exception: `get_network_load` reports the true collision rate as a stand-in for a gateway estimate. | `policies/`, `netsim/` | — |
 | A21 | Events last 30 min (jamming spec range: 2–10 min). With class-A control and one uplink per 10 min, no network-side controller can act on events shorter than about two reporting periods. | `configs/s*.yaml` | Shorter events would show no difference between controllers. |
-| A22 | In-sandbox agent runs use Qwen3-0.6B (Q4_K_M GGUF, llama.cpp) because Ollama and Hugging Face were unreachable; the reference model of the protocol (qwen2.5:3b via Ollama) runs on the author's laptop with the same scripts. | `results/` | 0.6B results are a lower bound on what a 3B/7B model does. |
+| A22 | Agent runs reported here use Qwen3-0.6B (Q4_K_M GGUF, llama.cpp) because Ollama and Hugging Face were unreachable; the reference model of the protocol (qwen2.5:3b via Ollama) runs on the author's laptop with the same scripts. | `results/` | 0.6B results are a lower bound on what a 3B/7B model does. |
